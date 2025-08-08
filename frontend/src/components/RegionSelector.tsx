@@ -39,7 +39,7 @@ export const RegionSelector = ({ imageUrl, imageFile, onAnalysisResult, onAnalys
     // Send to backend
     try {
       // Use environment variable for backend URL
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8080';
       console.log('API URL:', apiUrl);
       
       // Add cache busting to prevent caching issues
@@ -74,7 +74,7 @@ export const RegionSelector = ({ imageUrl, imageFile, onAnalysisResult, onAnalys
       if (data.boxes) setDetectedBoxes(data.boxes);
       setIsLoading(false);
       if (data.cropped_image) {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8080';
         setCroppedImageUrl(`${apiUrl}${data.cropped_image}`);
       }
       setAnalysis(data);

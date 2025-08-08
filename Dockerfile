@@ -12,21 +12,15 @@ WORKDIR /app
 # Upgrade pip and install wheel first
 RUN pip install --upgrade pip setuptools wheel
 
-# Create minimal requirements for Railway (demo mode)
-RUN echo "fastapi==0.104.1" > /app/requirements.txt && \
-    echo "uvicorn[standard]==0.24.0" >> /app/requirements.txt && \
-    echo "python-multipart==0.0.6" >> /app/requirements.txt && \
-    echo "requests==2.31.0" >> /app/requirements.txt && \
-    echo "aiofiles==23.2.1" >> /app/requirements.txt && \
-    echo "Pillow==10.0.1" >> /app/requirements.txt && \
-    echo "numpy==1.24.3" >> /app/requirements.txt && \
-    echo "python-dotenv==1.0.0" >> /app/requirements.txt
+# Copy requirements from backend
+COPY docker/backend-requirements.txt /app/requirements.txt
 
-# Install minimal dependencies (no PyTorch/ML libraries)
+# Install full dependencies for complete AI functionality
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy only the lightweight main file for Railway
-COPY railway_main.py /app/main.py
+# Copy the full backend application
+COPY backend/app/ /app/
+COPY backend/app/main.py /app/main.py
 COPY test_railway.py /app/test_railway.py
 COPY start.sh /app/start.sh
 COPY test_start.sh /app/test_start.sh
@@ -34,15 +28,26 @@ COPY test_start.sh /app/test_start.sh
 # Make startup script executable
 RUN chmod +x /app/start.sh /app/test_start.sh
 
+# Copy datasets for training (if needed)
+COPY datasets/ /app/datasets/
+
 # Create necessary directories
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/uploads \
+    && mkdir -p /app/models \
+    && mkdir -p /app/training_output \
+    && mkdir -p /app/synthetic_data \
+    && mkdir -p /app/data
 
 # Set environment variables
 ENV UPLOAD_DIR=/app/uploads
 ENV PYTHONPATH=/app
+ENV MODEL_PATH=/app/models
+ENV TRAINING_OUTPUT_DIR=/app/training_output
+ENV SYNTHETIC_DATA_DIR=/app/synthetic_data
+ENV DATA_DIR=/app/data
 
 # Expose port (Railway will map this to the dynamic PORT)
-EXPOSE 8000
+EXPOSE 8080
 
 # Health check removed for Railway compatibility
 # Railway has its own health checking mechanism

@@ -7,6 +7,10 @@ startCommand = "/app/start.sh"
 restartPolicyType = "on_failure"
 
 [env]
-PORT = { default = "8000" }
+PORT = { default = "8080" }
 UPLOAD_DIR = "/app/uploads"
 PYTHONPATH = "/app"
+MODEL_PATH = "/app/models"
+TRAINING_OUTPUT_DIR = "/app/training_output"
+SYNTHETIC_DATA_DIR = "/app/synthetic_data"
+DATA_DIR = "/app/data"
