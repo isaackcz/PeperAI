@@ -1,11 +1,9 @@
 # Lightweight build for Railway deployment
-FROM python:3.9-slim as backend
+FROM python:3.9 as backend
 
-# Install system dependencies including shell utilities
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
-    bash \
-    coreutils \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
