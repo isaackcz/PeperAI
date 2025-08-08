@@ -3,7 +3,7 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "/app/start.sh"
+startCommand = "/app/start_fullstack.sh"
 restartPolicyType = "on_failure"
 
 [env]
