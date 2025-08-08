@@ -18,13 +18,7 @@ import numpy as np
 import pickle
 from pathlib import Path
 
-# Custom StaticFiles class for SPA routing
-class SPAStaticFiles(StaticFiles):
-    async def get_response(self, path: str, scope):
-        response = await super().get_response(path, scope)
-        if response.status_code == 404:
-            response = await super().get_response('.', scope)
-        return response
+# Note: Using catch-all route for SPA routing instead of custom StaticFiles class
 
 # Try to import TensorFlow, but don't fail if it's not available
 try:
@@ -90,8 +84,6 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 STATIC_DIR = "static"
 if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-    # Mount SPA at root path for React routing
-    app.mount("/", SPAStaticFiles(directory=STATIC_DIR, html=True), name="spa")
 
 # Allow CORS for local frontend
 app.add_middleware(
@@ -1483,7 +1475,34 @@ async def select_object(
 #             "message": f"Failed to train advanced ANFIS model: {str(e)}"
 #         }, status_code=500)
 
-# SPAStaticFiles mounted at root will handle all frontend routing automatically
+# Serve favicon.ico from static directory
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve favicon.ico from static directory"""
+    static_dir = Path(STATIC_DIR)
+    favicon_file = static_dir / "favicon.ico"
+    
+    if favicon_file.exists():
+        return FileResponse(favicon_file)
+    else:
+        return JSONResponse({"detail": "Favicon not found"}, status_code=404)
+
+# Catch-all route to serve React app for non-API routes
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """Serve React app for all non-API routes"""
+    # Don't serve frontend for API routes
+    if full_path.startswith(("api/", "uploads/", "static/", "health", "model-status")):
+        return JSONResponse({"detail": "Not found"}, status_code=404)
+    
+    # Serve index.html for all other routes (React Router will handle them)
+    static_dir = Path(STATIC_DIR)
+    index_file = static_dir / "index.html"
+    
+    if index_file.exists():
+        return FileResponse(index_file)
+    else:
+        return JSONResponse({"detail": "Frontend not found"}, status_code=404)
 
 if __name__ == "__main__":
     import uvicorn
