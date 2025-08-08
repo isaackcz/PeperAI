@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from typing import Optional
 import shutil
 import os
@@ -77,6 +77,11 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 # Serve static files from uploads directory
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+# Serve frontend static files
+STATIC_DIR = "static"
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Allow CORS for local frontend
 app.add_middleware(
@@ -1467,6 +1472,21 @@ async def select_object(
 #             "status": "error",
 #             "message": f"Failed to train advanced ANFIS model: {str(e)}"
 #         }, status_code=500)
+
+# Catch-all route to serve React app for any non-API routes
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """Serve the React frontend for any routes that don't match API endpoints"""
+    # If it's an API route, let it pass through
+    if full_path.startswith("api/") or full_path.startswith("uploads/") or full_path.startswith("static/") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path.startswith("openapi.json"):
+        return JSONResponse({"error": "Not found"}, status_code=404)
+    
+    # For all other routes, serve the React app
+    static_file_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(static_file_path):
+        return FileResponse(static_file_path)
+    else:
+        return JSONResponse({"message": "Pepper Vision Backend API (Railway Demo)", "status": "running", "version": "1.0.0"})
 
 if __name__ == "__main__":
     import uvicorn
