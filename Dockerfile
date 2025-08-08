@@ -26,6 +26,9 @@ COPY start.sh /app/start.sh
 COPY start_fullstack.sh /app/start_fullstack.sh
 COPY test_start.sh /app/test_start.sh
 
+# Copy pre-built frontend files
+COPY frontend/dist /app/static
+
 # Make startup scripts executable
 RUN chmod +x /app/start.sh /app/start_fullstack.sh /app/test_start.sh
 
