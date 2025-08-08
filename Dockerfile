@@ -1,9 +1,11 @@
 # Lightweight build for Railway deployment
 FROM python:3.9-slim as backend
 
-# Install system dependencies
+# Install system dependencies including shell utilities
 RUN apt-get update && apt-get install -y \
     curl \
+    bash \
+    coreutils \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -40,4 +42,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
 # Start command
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
