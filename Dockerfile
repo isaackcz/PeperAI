@@ -15,14 +15,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend application
 COPY backend/ /app/backend/
-COPY datasets/ /app/datasets/
 
 # Create necessary directories
 RUN mkdir -p /app/backend/app/uploads \
     && mkdir -p /app/backend/models \
     && mkdir -p /app/backend/training_output \
     && mkdir -p /app/backend/synthetic_data \
-    && mkdir -p /app/backend/data
+    && mkdir -p /app/backend/data \
+    && mkdir -p /app/datasets
 
 # Set environment variables
 ENV UPLOAD_DIR=/app/backend/app/uploads
