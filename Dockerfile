@@ -1,8 +1,21 @@
 # Lightweight build for Railway deployment
 FROM python:3.9-alpine as backend
 
-# Install system dependencies
-RUN apk add --no-cache curl
+# Install system dependencies and build tools
+RUN apk add --no-cache \
+    curl \
+    gcc \
+    musl-dev \
+    linux-headers \
+    python3-dev \
+    jpeg-dev \
+    zlib-dev \
+    freetype-dev \
+    lcms2-dev \
+    openjpeg-dev \
+    tiff-dev \
+    tk-dev \
+    tcl-dev
 
 # Set working directory
 WORKDIR /app
