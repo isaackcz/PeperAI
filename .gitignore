@@ -48,6 +48,18 @@ venv.bak/
 .env.local
 .env.development.local
 .env.test.local
+
+# Model files (large files)
+*.h5
+*.pkl
+*.joblib
+*.model
+*.weights
+*.ckpt
+*.pb
+*.pth
+*.pt
+*.onnx
 .env.production.local
 
 # Node.js
@@ -226,4 +238,4 @@ Icon
 .AppleDesktop
 Network Trash Folder
 Temporary Items
-.apdisk 
+.apdisk
