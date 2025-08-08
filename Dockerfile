@@ -32,8 +32,8 @@ RUN mkdir -p /app/uploads
 ENV UPLOAD_DIR=/app/uploads
 ENV PYTHONPATH=/app
 
-# Expose port
-EXPOSE $PORT
+# Expose port (Railway will map this to the dynamic PORT)
+EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
