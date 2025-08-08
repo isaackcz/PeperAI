@@ -1473,12 +1473,25 @@ async def select_object(
 #             "message": f"Failed to train advanced ANFIS model: {str(e)}"
 #         }, status_code=500)
 
+# Specific route for favicon.ico
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """Serve favicon.ico from static directory"""
+    favicon_path = os.path.join(STATIC_DIR, "favicon.ico")
+    if os.path.exists(favicon_path):
+        return FileResponse(favicon_path)
+    else:
+        return JSONResponse({"error": "Favicon not found"}, status_code=404)
+
 # Catch-all route to serve React app for any non-API routes
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
     """Serve the React frontend for any routes that don't match API endpoints"""
     # If it's an API route, let it pass through
-    if full_path.startswith("api/") or full_path.startswith("uploads/") or full_path.startswith("static/") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path.startswith("openapi.json"):
+    if (full_path.startswith("api/") or full_path.startswith("uploads/") or 
+        full_path.startswith("static/") or full_path.startswith("docs") or 
+        full_path.startswith("redoc") or full_path.startswith("openapi.json") or
+        full_path == "favicon.ico"):
         return JSONResponse({"error": "Not found"}, status_code=404)
     
     # For all other routes, serve the React app
