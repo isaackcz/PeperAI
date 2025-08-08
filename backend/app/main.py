@@ -6,14 +6,25 @@ from typing import Optional
 import shutil
 import os
 import uuid
-from utils.color_grading import get_average_hsv, classify_ripeness_from_hsv
-import ast
-from utils.object_detection import detect_and_crop_object
+# Try to import ML utilities, but don't fail if not available
+try:
+    from utils.color_grading import get_average_hsv, classify_ripeness_from_hsv
+    from utils.object_detection import detect_and_crop_object
+    from utils.anfis_trainer import ANFISModel
+    from utils.feature_extractor import BellPepperFeatureExtractor
+    import cv2
+    ML_UTILS_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: ML utilities not available: {e}")
+    ML_UTILS_AVAILABLE = False
+    get_average_hsv = None
+    classify_ripeness_from_hsv = None
+    detect_and_crop_object = None
+    ANFISModel = None
+    BellPepperFeatureExtractor = None
+    cv2 = None
 
-# Import ANFIS components
-from utils.anfis_trainer import ANFISModel
-from utils.feature_extractor import BellPepperFeatureExtractor
-import cv2
+import ast
 import numpy as np
 import pickle
 from pathlib import Path
@@ -41,6 +52,7 @@ try:
     from torch.nn.modules.conv import Conv2d
     from torch.nn.modules.batchnorm import BatchNorm2d
     from torch.nn.modules.activation import SiLU
+    TORCH_AVAILABLE = True
     
     # Add safe globals for ultralytics components
     additional_safe_globals = [
@@ -72,6 +84,8 @@ try:
     print("PyTorch safe globals configured for YOLO model loading")
 except ImportError as e:
     print(f"Warning: PyTorch or Ultralytics not available: {e}")
+    TORCH_AVAILABLE = False
+    torch = None
 
 app = FastAPI()
 
@@ -102,8 +116,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize ANFIS components
-feature_extractor = BellPepperFeatureExtractor()
+# Initialize ANFIS components (if available)
+feature_extractor = BellPepperFeatureExtractor() if ML_UTILS_AVAILABLE else None
 
 # Global variables for trained models
 trained_models = []
@@ -177,6 +191,19 @@ def load_trained_models():
 def predict_with_anfis(image_path: str) -> dict:
     """Predict bell pepper category using ANFIS models only"""
     global trained_models, preprocessing_data, label_mapping
+    
+    if not ML_UTILS_AVAILABLE:
+        # Return demo response when ML utilities are not available
+        import random
+        categories = ['damaged', 'dried', 'old', 'ripe', 'unripe']
+        category = random.choice(categories)
+        confidence = random.uniform(0.6, 0.95)
+        return {
+            'category': category,
+            'confidence': confidence,
+            'probabilities': {cat: random.uniform(0.1, 0.9) for cat in categories},
+            'message': f'Demo mode: ML utilities not available. Classified as {category} with {confidence:.3f} confidence'
+        }
     
     if not trained_models or not preprocessing_data:
         # Fallback demo response
