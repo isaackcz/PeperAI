@@ -1,0 +1,56 @@
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for OpenCV and other libraries
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libgcc-s1 \
+    libstdc++6 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements for models service
+COPY docker/models-requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy model-related code
+COPY backend/app/utils/ ./utils/
+COPY backend/train_*.py ./
+COPY backend/test_*.py ./
+COPY backend/app/train_models.py ./
+COPY backend/performance_report.py ./
+
+# Create necessary directories
+RUN mkdir -p models training_output synthetic_data data
+
+# Copy model files (only if they contain actual model files)
+# Note: models and training_output directories are created but empty initially
+# They will be populated when models are trained
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV MODEL_PATH=/app/models
+ENV TRAINING_OUTPUT_DIR=/app/training_output
+ENV SYNTHETIC_DATA_DIR=/app/synthetic_data
+ENV DATA_DIR=/app/data
+
+# Expose port for model service API
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8001/health || exit 1
+
+# Create a simple model service API
+COPY docker/model_service.py ./model_service.py
+COPY minimal_model_service.py ./minimal_model_service.py
+
+# Start the minimal model service (fallback until models are trained)
+CMD ["uvicorn", "minimal_model_service:app", "--host", "0.0.0.0", "--port", "8001"]

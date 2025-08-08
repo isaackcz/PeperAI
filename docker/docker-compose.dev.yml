@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  models-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.models
+    container_name: pepper-models-dev
+    ports:
+      - "8001:8001"
+    volumes:
+      - ../backend:/app/backend
+      - ../backend/models:/app/models
+      - ../backend/training_output:/app/training_output
+      - ../backend/synthetic_data:/app/synthetic_data
+      - ../backend/data:/app/data
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=development
+      - MODEL_PATH=/app/models
+      - TRAINING_OUTPUT_DIR=/app/training_output
+      - SYNTHETIC_DATA_DIR=/app/synthetic_data
+      - DATA_DIR=/app/data
+    networks:
+      - bell-pepper-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend.dev
+    container_name: pepper-backend-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../backend/app:/app/backend/app
+      - ../backend/app/uploads:/app/backend/app/uploads
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=development
+      - UPLOAD_DIR=/app/backend/app/uploads
+      - MODELS_SERVICE_URL=http://models-dev:8001
+    depends_on:
+      models-dev:
+        condition: service_healthy
+    networks:
+      - bell-pepper-network
+
+  frontend-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend.dev
+    container_name: pepper-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - NODE_ENV=development
+    networks:
+      - bell-pepper-network
+    depends_on:
+      - backend-dev
+
+networks:
+  bell-pepper-network:
+    driver: bridge

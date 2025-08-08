@@ -1,0 +1,41 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bell Pepper Shape -->
+  <path d="M100 20 C60 20, 30 50, 30 90 C30 130, 60 160, 100 160 C140 160, 170 130, 170 90 C170 50, 140 20, 100 20 Z" 
+        fill="#2d5a27" stroke="#1a3d1a" stroke-width="2"/>
+  
+  <!-- Bell Pepper Highlights -->
+  <path d="M80 40 C70 40, 60 50, 60 70 C60 90, 70 100, 80 100 C90 100, 100 90, 100 70 C100 50, 90 40, 80 40 Z" 
+        fill="#4a7c59" opacity="0.6"/>
+  
+  <!-- AI Circuit Pattern -->
+  <g stroke="#00ff88" stroke-width="1" fill="none" opacity="0.7">
+    <line x1="40" y1="60" x2="60" y2="60"/>
+    <line x1="60" y1="60" x2="60" y2="80"/>
+    <line x1="60" y1="80" x2="80" y2="80"/>
+    <line x1="80" y1="80" x2="80" y2="100"/>
+    <line x1="80" y1="100" x2="100" y2="100"/>
+    <line x1="100" y1="100" x2="100" y2="120"/>
+    <line x1="100" y1="120" x2="120" y2="120"/>
+    <line x1="120" y1="120" x2="120" y2="140"/>
+    <line x1="120" y1="140" x2="140" y2="140"/>
+    <line x1="140" y1="140" x2="140" y2="120"/>
+    <line x1="140" y1="120" x2="160" y2="120"/>
+    
+    <!-- Circuit Nodes -->
+    <circle cx="60" cy="60" r="2" fill="#00ff88"/>
+    <circle cx="80" cy="80" r="2" fill="#00ff88"/>
+    <circle cx="100" cy="100" r="2" fill="#00ff88"/>
+    <circle cx="120" cy="120" r="2" fill="#00ff88"/>
+    <circle cx="140" cy="140" r="2" fill="#00ff88"/>
+  </g>
+  
+  <!-- AI Eye/Scanner -->
+  <circle cx="100" cy="80" r="15" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.8"/>
+  <circle cx="100" cy="80" r="8" fill="#00ff88" opacity="0.6"/>
+  <circle cx="100" cy="80" r="3" fill="#ffffff"/>
+  
+  <!-- Text -->
+  <text x="100" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#2d5a27" font-weight="bold">
+    PEPPER VISION AI
+  </text>
+</svg> 

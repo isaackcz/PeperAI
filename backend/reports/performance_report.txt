@@ -1,0 +1,157 @@
+================================================================================
+BELL PEPPER CLASSIFICATION MODEL PERFORMANCE REPORT
+================================================================================
+
+📊 OVERALL PERFORMANCE SUMMARY
+----------------------------------------
+Anfis: 18.64% accuracy
+Transfer Learning: 92.37% accuracy
+Ensemble: 85.17% accuracy
+
+🏆 BEST PERFORMING MODEL: Transfer Learning (92.37%)
+
+📈 PER-CLASS PERFORMANCE ANALYSIS
+----------------------------------------
+
+DAMAGED CLASS:
+  Anfis:
+    Precision: 0.000
+    Recall: 0.000
+    F1-Score: 0.000
+    Support: 6 samples
+  Transfer Learning:
+    Precision: 0.750
+    Recall: 1.000
+    F1-Score: 0.857
+    Support: 6 samples
+  Ensemble:
+    Precision: 0.600
+    Recall: 1.000
+    F1-Score: 0.750
+    Support: 6 samples
+  🎯 Best for damaged: Transfer Learning (F1: 0.857)
+
+DRIED CLASS:
+  Anfis:
+    Precision: 0.060
+    Recall: 0.068
+    F1-Score: 0.063
+    Support: 59 samples
+  Transfer Learning:
+    Precision: 1.000
+    Recall: 1.000
+    F1-Score: 1.000
+    Support: 59 samples
+  Ensemble:
+    Precision: 0.966
+    Recall: 0.966
+    F1-Score: 0.966
+    Support: 59 samples
+  🎯 Best for dried: Transfer Learning (F1: 1.000)
+
+OLD CLASS:
+  Anfis:
+    Precision: 0.167
+    Recall: 0.014
+    F1-Score: 0.026
+    Support: 70 samples
+  Transfer Learning:
+    Precision: 0.935
+    Recall: 0.829
+    F1-Score: 0.879
+    Support: 70 samples
+  Ensemble:
+    Precision: 0.865
+    Recall: 0.643
+    F1-Score: 0.738
+    Support: 70 samples
+  🎯 Best for old: Transfer Learning (F1: 0.879)
+
+RIPE CLASS:
+  Anfis:
+    Precision: 0.295
+    Recall: 0.433
+    F1-Score: 0.351
+    Support: 90 samples
+  Transfer Learning:
+    Precision: 0.876
+    Recall: 0.944
+    F1-Score: 0.909
+    Support: 90 samples
+  Ensemble:
+    Precision: 0.790
+    Recall: 0.922
+    F1-Score: 0.851
+    Support: 90 samples
+  🎯 Best for ripe: Transfer Learning (F1: 0.909)
+
+UNRIPE CLASS:
+  Anfis:
+    Precision: 0.000
+    Recall: 0.000
+    F1-Score: 0.000
+    Support: 11 samples
+  Transfer Learning:
+    Precision: 1.000
+    Recall: 0.909
+    F1-Score: 0.952
+    Support: 11 samples
+  Ensemble:
+    Precision: 1.000
+    Recall: 0.909
+    F1-Score: 0.952
+    Support: 11 samples
+  🎯 Best for unripe: Transfer Learning (F1: 0.952)
+
+MACRO AVG CLASS:
+  Anfis:
+    Precision: 0.104
+    Recall: 0.103
+    F1-Score: 0.088
+    Support: 236 samples
+  Transfer Learning:
+    Precision: 0.912
+    Recall: 0.936
+    F1-Score: 0.919
+    Support: 236 samples
+  Ensemble:
+    Precision: 0.844
+    Recall: 0.888
+    F1-Score: 0.851
+    Support: 236 samples
+  🎯 Best for macro avg: Transfer Learning (F1: 0.919)
+
+WEIGHTED AVG CLASS:
+  Anfis:
+    Precision: 0.177
+    Recall: 0.186
+    F1-Score: 0.158
+    Support: 236 samples
+  Transfer Learning:
+    Precision: 0.927
+    Recall: 0.924
+    F1-Score: 0.924
+    Support: 236 samples
+  Ensemble:
+    Precision: 0.862
+    Recall: 0.852
+    F1-Score: 0.848
+    Support: 236 samples
+  🎯 Best for weighted avg: Transfer Learning (F1: 0.924)
+
+================================================================================
+🔍 KEY INSIGHTS
+================================================================================
+• Transfer Learning shows excellent performance on damaged and dried classes
+• High precision and recall for most categories
+• Ensemble combines strengths of both approaches
+• Provides balanced performance across all classes
+
+================================================================================
+💡 RECOMMENDATIONS
+================================================================================
+1. Use Transfer Learning for highest overall accuracy
+2. Use Ensemble for balanced performance across all classes
+3. Consider ANFIS for specific cases where interpretability is important
+4. Add more training data for minority classes (damaged, unripe)
+5. Fine-tune ensemble weights based on specific use case requirements

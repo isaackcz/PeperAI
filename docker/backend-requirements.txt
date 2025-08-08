@@ -1,0 +1,26 @@
+# Core FastAPI and server dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# HTTP client for communicating with models service
+requests==2.31.0
+aiofiles==23.2.1
+httpx==0.25.0
+
+# Basic image processing (minimal)
+Pillow==10.0.1
+numpy==1.24.3
+
+# YOLO and PyTorch dependencies
+torch==2.0.1
+torchvision==0.15.2
+ultralytics==8.0.196
+opencv-python==4.8.1.78
+
+# Utilities
+python-dotenv==1.0.0
+
+# Development and testing
+pytest==7.4.2
+pytest-asyncio==0.21.1

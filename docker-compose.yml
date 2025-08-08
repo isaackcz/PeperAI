@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  models:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.models
+    container_name: bell-pepper-models
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend/models:/app/models
+      - ./backend/training_output:/app/training_output
+      - ./backend/synthetic_data:/app/synthetic_data
+      - ./backend/data:/app/data
+      - ./datasets:/app/datasets
+    environment:
+      - MODEL_PATH=/app/models
+      - TRAINING_OUTPUT_DIR=/app/training_output
+      - SYNTHETIC_DATA_DIR=/app/synthetic_data
+      - DATA_DIR=/app/data
+    restart: unless-stopped
+    networks:
+      - bell-pepper-network
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 10
+    #   start_period: 120s
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: bell-pepper-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app/uploads:/app/backend/app/uploads
+    environment:
+      - UPLOAD_DIR=/app/backend/app/uploads
+      - MODELS_SERVICE_URL=http://models:8001
+    depends_on:
+      - models
+    restart: unless-stopped
+    networks:
+      - bell-pepper-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: bell-pepper-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - bell-pepper-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  bell-pepper-network:
+    driver: bridge
