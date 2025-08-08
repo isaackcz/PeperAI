@@ -1,29 +1,9 @@
-# Multi-stage build for Railway deployment with frontend + backend
+# Simplified Railway deployment - Backend only for now
+FROM python:3.9-slim
 
-# Stage 1: Build frontend
-FROM node:18-alpine as frontend-build
-
-WORKDIR /app/frontend
-
-# Copy frontend package files
-COPY frontend/package*.json ./
-
-# Install frontend dependencies
-RUN npm ci
-
-# Copy frontend source
-COPY frontend/ ./
-
-# Build frontend for production
-RUN npm run build
-
-# Stage 2: Backend with frontend integration
-FROM python:3.9-slim as backend
-
-# Install system dependencies including nginx
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
-    nginx \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -45,12 +25,6 @@ COPY test_railway.py /app/test_railway.py
 COPY start.sh /app/start.sh
 COPY start_fullstack.sh /app/start_fullstack.sh
 COPY test_start.sh /app/test_start.sh
-
-# Copy built frontend from previous stage
-COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
 
 # Make startup scripts executable
 RUN chmod +x /app/start.sh /app/start_fullstack.sh /app/test_start.sh
