@@ -161,8 +161,4 @@ async def predict_anfis_endpoint(image: UploadFile = File(...)):
     """Predict using ANFIS"""
     return await predict_pepper(image, "anfis")
 
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("railway_main:app", host="0.0.0.0", port=port, reload=True)
+# Removed uvicorn.run() - using start.sh for Railway deployment
