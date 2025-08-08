@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy backend requirements and install dependencies
-COPY backend/requirements.txt /app/requirements.txt
+COPY docker/backend-requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend application
