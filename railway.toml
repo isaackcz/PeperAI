@@ -3,15 +3,10 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "cd /app/backend/app && uvicorn main:app --host 0.0.0.0 --port $PORT"
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
 restartPolicyType = "on_failure"
 
 [env]
 PORT = { default = "8000" }
-UPLOAD_DIR = "/app/backend/app/uploads"
-MODEL_PATH = "/app/backend/models"
-TRAINING_OUTPUT_DIR = "/app/backend/training_output"
-SYNTHETIC_DATA_DIR = "/app/backend/synthetic_data"
-DATA_DIR = "/app/backend/data"
-MODELS_SERVICE_URL = "http://localhost:8001"
-PYTHONPATH = "/app/backend"
+UPLOAD_DIR = "/app/uploads"
+PYTHONPATH = "/app"
