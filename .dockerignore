@@ -185,5 +185,4 @@ backend/data/
 frontend/node_modules/
 
 # Package lock files (will be copied separately)
-frontend/package-lock.json
 frontend/yarn.lock
