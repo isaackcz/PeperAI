@@ -1,10 +1,8 @@
 # Lightweight build for Railway deployment
-FROM python:3.9 as backend
+FROM python:3.9-alpine as backend
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl
 
 # Set working directory
 WORKDIR /app
@@ -24,6 +22,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy only the lightweight main file for Railway
 COPY railway_main.py /app/main.py
+COPY start.sh /app/start.sh
+
+# Make startup script executable
+RUN chmod +x /app/start.sh
 
 # Create necessary directories
 RUN mkdir -p /app/uploads
@@ -37,7 +39,7 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+    CMD curl -f http://localhost:8000/health || exit 1
 
 # Start command
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["/app/start.sh"]
