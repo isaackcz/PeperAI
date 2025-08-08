@@ -5,6 +5,7 @@ FROM python:3.9-alpine as backend
 RUN apk add --no-cache \
     curl \
     gcc \
+    g++ \
     musl-dev \
     linux-headers \
     python3-dev \
@@ -15,10 +16,19 @@ RUN apk add --no-cache \
     openjpeg-dev \
     tiff-dev \
     tk-dev \
-    tcl-dev
+    tcl-dev \
+    libffi-dev \
+    openssl-dev \
+    blas-dev \
+    lapack-dev \
+    gfortran \
+    pkgconfig
 
 # Set working directory
 WORKDIR /app
+
+# Upgrade pip and install wheel first
+RUN pip install --upgrade pip setuptools wheel
 
 # Create minimal requirements for Railway (demo mode)
 RUN echo "fastapi==0.104.1" > /app/requirements.txt && \
