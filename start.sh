@@ -9,4 +9,4 @@ env | grep -E "(PORT|RAILWAY)" || echo "No PORT/RAILWAY vars found"
 PORT=${PORT:-8080}
 echo "DEBUG: Using PORT: $PORT"
 
-exec uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1
+exec uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
