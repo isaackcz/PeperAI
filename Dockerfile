@@ -27,10 +27,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy only the lightweight main file for Railway
 COPY railway_main.py /app/main.py
+COPY test_railway.py /app/test_railway.py
 COPY start.sh /app/start.sh
+COPY test_start.sh /app/test_start.sh
 
 # Make startup script executable
-RUN chmod +x /app/start.sh
+RUN chmod +x /app/start.sh /app/test_start.sh
 
 # Create necessary directories
 RUN mkdir -p /app/uploads
