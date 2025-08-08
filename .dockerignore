@@ -136,7 +136,6 @@ venv.bak/
 .env.production.local
 
 # Large files and datasets
-datasets/
 *.zip
 *.tar.gz
 *.rar
@@ -187,4 +186,4 @@ frontend/node_modules/
 
 # Package lock files (will be copied separately)
 frontend/package-lock.json
-frontend/yarn.lock 
+frontend/yarn.lock
