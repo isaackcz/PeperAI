@@ -1,4 +1,21 @@
-# Simplified Railway deployment - Backend only for now
+# Multi-stage build: Frontend
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copy frontend package files
+COPY frontend/package*.json ./
+
+# Install frontend dependencies
+RUN npm ci
+
+# Copy frontend source code
+COPY frontend/ ./
+
+# Build frontend
+RUN npm run build
+
+# Backend stage
 FROM python:3.9-slim
 
 # Install system dependencies
@@ -26,8 +43,8 @@ COPY start.sh /app/start.sh
 COPY start_fullstack.sh /app/start_fullstack.sh
 COPY test_start.sh /app/test_start.sh
 
-# Copy pre-built frontend files
-COPY frontend/dist /app/static
+# Copy built frontend files from frontend-builder stage
+COPY --from=frontend-builder /app/frontend/dist /app/static
 
 # Make startup scripts executable
 RUN chmod +x /app/start.sh /app/start_fullstack.sh /app/test_start.sh
