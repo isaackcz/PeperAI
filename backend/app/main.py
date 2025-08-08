@@ -18,6 +18,14 @@ import numpy as np
 import pickle
 from pathlib import Path
 
+# Custom StaticFiles class for SPA routing
+class SPAStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if response.status_code == 404:
+            response = await super().get_response('.', scope)
+        return response
+
 # Try to import TensorFlow, but don't fail if it's not available
 try:
     import tensorflow as tf
@@ -82,6 +90,8 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 STATIC_DIR = "static"
 if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    # Mount SPA at root path for React routing
+    app.mount("/", SPAStaticFiles(directory=STATIC_DIR, html=True), name="spa")
 
 # Allow CORS for local frontend
 app.add_middleware(
@@ -1473,33 +1483,7 @@ async def select_object(
 #             "message": f"Failed to train advanced ANFIS model: {str(e)}"
 #         }, status_code=500)
 
-# Specific route for favicon.ico
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    """Serve favicon.ico from static directory"""
-    favicon_path = os.path.join(STATIC_DIR, "favicon.ico")
-    if os.path.exists(favicon_path):
-        return FileResponse(favicon_path)
-    else:
-        return JSONResponse({"error": "Favicon not found"}, status_code=404)
-
-# Catch-all route to serve React app for any non-API routes
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    """Serve the React frontend for any routes that don't match API endpoints"""
-    # If it's an API route, let it pass through
-    if (full_path.startswith("api/") or full_path.startswith("uploads/") or 
-        full_path.startswith("static/") or full_path.startswith("docs") or 
-        full_path.startswith("redoc") or full_path.startswith("openapi.json") or
-        full_path == "favicon.ico"):
-        return JSONResponse({"error": "Not found"}, status_code=404)
-    
-    # For all other routes, serve the React app
-    static_file_path = os.path.join(STATIC_DIR, "index.html")
-    if os.path.exists(static_file_path):
-        return FileResponse(static_file_path)
-    else:
-        return JSONResponse({"message": "Pepper Vision Backend API (Railway Demo)", "status": "running", "version": "1.0.0"})
+# SPAStaticFiles mounted at root will handle all frontend routing automatically
 
 if __name__ == "__main__":
     import uvicorn
