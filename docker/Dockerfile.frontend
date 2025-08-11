@@ -25,7 +25,7 @@ COPY frontend/eslint.config.js ./
 COPY frontend/components.json ./
 
 # Copy logo file to public directory for easier access
-COPY ../LOGO.png ./public/LOGO.png
+COPY LOGO.png ./public/LOGO.png
 
 # Build the application
 RUN npm run build
