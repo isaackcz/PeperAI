@@ -1,0 +1,164 @@
+version: '3.8'
+
+services:
+  pepper-vision-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Support multiple architectures
+      platforms:
+        - linux/arm64
+        - linux/amd64
+    container_name: pepper-vision
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DATABASE_URL=sqlite:///./app.db
+      - ALLOWED_ORIGINS=*
+      - SECRET_KEY=${SECRET_KEY:-change-this-super-secret-key}
+      - ML_UTILS_AVAILABLE=false
+      - TORCH_AVAILABLE=false
+    volumes:
+      - ./uploads:/app/uploads
+      - ./data:/app/data
+      - app_data:/app/app_data
+    networks:
+      - pepper-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Resource limits for Oracle Cloud A1 Flex
+    deploy:
+      resources:
+        limits:
+          memory: 20G  # Leave 4GB for system
+          cpus: '3.5'  # Leave 0.5 CPU for system
+        reservations:
+          memory: 2G
+          cpus: '1'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Redis for caching (if needed)
+  redis:
+    image: redis:7-alpine
+    container_name: pepper-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pepper-network
+    command: redis-server --appendonly yes --maxmemory 1gb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    profiles:
+      - redis  # Only start if explicitly requested
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: pepper-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - pepper-network
+    depends_on:
+      - pepper-vision-app
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    profiles:
+      - nginx  # Only start if explicitly requested
+
+  # Optional: Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pepper-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - pepper-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    profiles:
+      - monitoring  # Only start if explicitly requested
+
+  # Optional: Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pepper-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - pepper-network
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    profiles:
+      - monitoring  # Only start if explicitly requested
+
+volumes:
+  app_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  pepper-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
