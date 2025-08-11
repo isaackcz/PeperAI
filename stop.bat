@@ -96,4 +96,4 @@ echo To view container status: docker-compose ps
 echo To view logs: docker-compose logs
 echo.
 echo Press any key to exit...
-pause >nul
+pause

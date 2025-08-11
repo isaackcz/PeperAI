@@ -105,4 +105,4 @@ if "%all_good%"=="1" (
 echo ========================================
 echo.
 echo Press any key to exit...
-pause >nul
+pause

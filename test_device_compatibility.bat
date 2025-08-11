@@ -80,4 +80,4 @@ echo.
 :end
 echo ========================================
 echo Test completed. Press any key to exit.
-pause >nul
+pause
